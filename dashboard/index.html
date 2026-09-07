@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CitySight / ANPR Operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/dashboard/styles.css">
+</head>
+<body>
+<header class="topbar"><div class="brand"><span class="brand-mark">CS</span><span>CitySight</span><small>ANPR OPERATIONS</small></div><div class="status"><span class="pulse"></span><span id="service-status">Connecting</span><span class="divider"></span><span>07 SEP 2026 / 09:20 IST</span></div></header>
+<main class="shell"><section class="intro"><div><p class="eyebrow">CITY-WIDE MOVEMENT INTELLIGENCE</p><h1>Traffic, traced.</h1><p class="lede">Follow a plate across camera nodes, inspect detections, and surface priority alerts from one operational view.</p></div><div class="intro-meta"><span class="live-dot"></span> DEMO NETWORK <strong>04</strong> CAMERAS ONLINE</div></section>
+<section class="metrics" id="metrics"></section>
+<section class="workspace"><div class="map-panel panel"><div class="panel-head"><div><p class="eyebrow">SPATIAL TRACE</p><h2>Camera network</h2></div><div class="map-legend"><span class="legend-line"></span> selected route</div></div><div id="map"></div></div><aside class="side-panel"><section class="panel search-panel"><div class="panel-head"><div><p class="eyebrow">QUERY VEHICLE</p><h2>Trajectory lookup</h2></div><span class="icon-label">⌕</span></div><form id="search-form"><label for="plate-input">Registration plate</label><div class="search-row"><input id="plate-input" value="DL8CAF1234" autocomplete="off"><button type="submit">Trace <span>→</span></button></div><p class="hint">Try <button class="plate-link" type="button" data-plate="MH12RT9087">MH12RT9087</button> or <button class="plate-link" type="button" data-plate="KA01MN5522">KA01MN5522</button></p></form><div id="trajectory-summary" class="trajectory-summary"></div></section><section class="panel alerts-panel"><div class="panel-head"><div><p class="eyebrow">PRIORITY QUEUE</p><h2>Active alerts</h2></div><span id="alert-count" class="count-badge">0</span></div><div id="alerts" class="alerts-list"></div></section></aside></section>
+<section class="lower-grid"><section class="panel"><div class="panel-head"><div><p class="eyebrow">NETWORK LOAD</p><h2>Camera activity</h2></div><span class="muted-label">TODAY / DEMO DATA</span></div><div id="camera-table" class="camera-table"></div></section><section class="panel"><div class="panel-head"><div><p class="eyebrow">MOVEMENT PATTERNS</p><h2>Top routes</h2></div></div><div id="routes" class="routes-list"></div></section></section></main><footer><span>CitySight prototype / SIH26127</span><span>Model adapters: pending integration</span></footer>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="/dashboard/app.js"></script>
+</body></html>

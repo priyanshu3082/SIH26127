@@ -1,0 +1,10 @@
+[
+  {"id":1,"plate_text":"DL8CAF1234","raw_ocr_text":"DL 8C AF 1234","confidence":0.96,"camera_id":"CAM-001","detected_at":"2026-09-07T09:02:00Z","latitude":28.6139,"longitude":77.209,"vehicle_type":"car"},
+  {"id":2,"plate_text":"DL8CAF1234","raw_ocr_text":"DL8CAF1234","confidence":0.94,"camera_id":"CAM-002","detected_at":"2026-09-07T09:09:00Z","latitude":28.62,"longitude":77.215,"vehicle_type":"car"},
+  {"id":3,"plate_text":"DL8CAF1234","raw_ocr_text":"DL8CAF1234","confidence":0.91,"camera_id":"CAM-003","detected_at":"2026-09-07T09:15:00Z","latitude":28.626,"longitude":77.2205,"vehicle_type":"car"},
+  {"id":4,"plate_text":"MH12RT9087","raw_ocr_text":"MH12RT9087","confidence":0.89,"camera_id":"CAM-002","detected_at":"2026-09-07T09:06:00Z","latitude":28.62,"longitude":77.215,"vehicle_type":"suv"},
+  {"id":5,"plate_text":"MH12RT9087","raw_ocr_text":"MH12RT9087","confidence":0.93,"camera_id":"CAM-004","detected_at":"2026-09-07T09:18:00Z","latitude":28.6335,"longitude":77.226,"vehicle_type":"suv"},
+  {"id":6,"plate_text":"KA01MN5522","raw_ocr_text":"KA01MN5522","confidence":0.97,"camera_id":"CAM-001","detected_at":"2026-09-07T09:04:00Z","latitude":28.6139,"longitude":77.209,"vehicle_type":"motorcycle"},
+  {"id":7,"plate_text":"KA01MN5522","raw_ocr_text":"KA01MN5522","confidence":0.95,"camera_id":"CAM-003","detected_at":"2026-09-07T09:13:00Z","latitude":28.626,"longitude":77.2205,"vehicle_type":"motorcycle"},
+  {"id":8,"plate_text":"UP16BX4410","raw_ocr_text":"UP16BX4410","confidence":0.88,"camera_id":"CAM-003","detected_at":"2026-09-07T09:11:00Z","latitude":28.626,"longitude":77.2205,"vehicle_type":"car"}
+]

@@ -1,0 +1,6 @@
+[
+  {"camera_id":"CAM-001","name":"Central Gate","latitude":28.6139,"longitude":77.209,"direction":"north","status":"online"},
+  {"camera_id":"CAM-002","name":"Market Road","latitude":28.62,"longitude":77.215,"direction":"east","status":"online"},
+  {"camera_id":"CAM-003","name":"River Junction","latitude":28.626,"longitude":77.2205,"direction":"south","status":"online"},
+  {"camera_id":"CAM-004","name":"Tech Park Exit","latitude":28.6335,"longitude":77.226,"direction":"west","status":"warning"}
+]
