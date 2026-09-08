@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.venv/
+venv/
+
+# trajectory-engine runtime data (SQLite db, cached road graph, generated maps/exports)
+trajectory-engine/data/
+trajectory-engine/cache/
+*.db
+*.graphml
+trajectory_map.html
+fleet_map.html
+
+# CityFlowV2 dataset (17GB of video + annotations - never commit this)
+trajectory-engine/CITYFLOW DATA/
+trajectory-engine/cityflow*/
+
+# OS
+.DS_Store
+Thumbs.db
