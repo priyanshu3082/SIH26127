@@ -2,7 +2,9 @@
 
 City-Wide AI Engine for Multi-Camera ANPR Trajectory Tracking and Urban Traffic Analytics.
 
-See [PROJECT_STATUS.md](PROJECT_STATUS.md) for the team's working notes and decisions.
+**Read [PROJECT_STATUS.md](PROJECT_STATUS.md) first.** It's the single living status
+doc for the project — what's built, what's verified, known limitations, and what's
+still pending. Anyone new to the repo should start there before reading any code.
 
 ## Repo layout
 
