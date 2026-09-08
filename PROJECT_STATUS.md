@@ -290,6 +290,91 @@ prototype, not the deck's eventual production stack):**
 - "Suspicious route deviation" alerting is deliberately deferred — needs a historical
   per-vehicle baseline this prototype has no data to build.
 
+## Assumptions baked into the data (read before feeding this real input)
+
+Things `trajectory-engine` assumes are already true about incoming data, rather than
+things it derives or checks itself:
+
+- **Clock sync is already solved.** `ts` is assumed to be a clean, synchronized Unix
+  timestamp. Zero NTP/PTP drift-correction exists in this codebase, even though the
+  deck's own feasibility slide names clock drift as a real risk — synchronization has
+  to happen *before* timestamps reach this system, or Stage 2's feasibility math (which
+  is entirely gap-vs-expected-time) will silently misjudge real transitions.
+- **Cameras are pre-registered.** Every event assumes its `camera_id` already exists in
+  the `cameras` table (id, name, lat, lon) — it's a foreign key. Nothing in the repo
+  manages "a new physical camera came online"; the synthetic generator fakes this by
+  placing cameras itself. **Nobody currently owns a real camera-registry process.**
+- **One row per vehicle pass, not per video frame.** The schema assumes within-camera
+  tracking (ByteTrack/BoT-SORT) already collapsed a full pass through one camera into a
+  single representative plate read. If a producer instead emits one row per frame,
+  Stage 2/3 will see a flood of near-duplicate events with near-zero time gaps and get
+  confused.
+- **OCR confidence is meaningful.** Stage 3's cost function leans on `confidence` being
+  a real, calibrated 0-1 score. An uncalibrated or absent confidence value breaks that
+  weighting silently — bad reads get trusted as much as good ones.
+- **Vehicle attributes are always non-null — a real gap found while writing this.**
+  `assignment/hungarian.py`'s `_attribute_mismatch()` treats two missing values
+  (`vehicle_type` absent on both sides) as a **match** (`None == None` → True), quietly
+  inflating confidence for pairs where attribute data is simply absent, instead of
+  treating it as "no signal." Not caught by existing tests since the synthetic
+  generator always populates these fields. **Needs fixing before a real
+  attribute-extraction model (which can return null) feeds this.**
+- **Plate format is narrow HSRP only.** The grammar regex only covers 2-letter-state +
+  1-2-digit + 1-2-letter + 4-digit. BH-series, EV green plates, dealer/temporary
+  plates, and diplomatic plates all get rejected by Stage 1 outright as-is.
+- **The confusion table is a minimal starting set.** Only 4 character pairs modeled
+  (0/O, 1/I, 5/S, 8/B) — real OCR error patterns will likely need more added once real
+  misread data exists to look at.
+- **Thresholds are hand-picked, not calibrated.** Edit-distance ≤2, the 0.8×/3.0×
+  feasibility multipliers, Stage 3's cost weights — reasonable guesses, none tuned
+  against real data yet.
+- **One camera = one point location.** No modeling of multiple cameras at one
+  intersection, per-lane cameras, or one camera covering more than one direction.
+- **SQLite assumes low write concurrency.** A real live-ingestion pipeline writing
+  continuously while an API reads simultaneously will hit SQLite's locking limits —
+  Postgres is the flagged swap-out, not yet done.
+- **`case_id` is trusted, not authorized.** `reconstruct_trajectory` only checks the
+  string is non-empty — it doesn't verify the case exists or that the caller may use
+  it. It logs faithfully, enforces nothing. Real authorization is assumed to be
+  someone else's layer.
+- **Synthetic traffic patterns are simplistic.** Random origin-destination pairs, no
+  rush-hour peaks, no realistic route popularity — O-D/analytics have only been
+  checked against this simplified pattern.
+
+## What each other part of the project depends on / must do
+
+- **`detection/` (YOLO + OCR + ByteTrack) owner** — must emit rows in exactly
+  `plate_events`' shape (pre-registered `camera_id`, clock-synced `ts`, `plate_raw`,
+  calibrated `confidence`, `vehicle_type`/`vehicle_color`), deduped to one row per
+  vehicle pass. Must write to whatever storage trajectory-engine ends up using
+  (SQLite now, likely Postgres later) — isolated to `db/store.py`, the one file that
+  needs coordinating on.
+- **Camera registration & clock sync owner** *(currently nobody)* — needs to populate
+  `cameras` before a camera goes live, and needs an NTP/PTP strategy. Both are
+  currently assumed already solved.
+- **`reid/` (TransReID) owner** — needs to source the separate CityFlowV2-ReID crop
+  dataset, or crop training images from CityFlowV2's raw videos using `gt.txt` boxes
+  (neither exists yet). Needs to coordinate wiring a real appearance-similarity score
+  into `assignment/hungarian.py`'s cost function — a slot is left for this, only a
+  cheap type/colour stand-in exists today.
+- **`api/` owner** — wraps `pipeline.reconstruct_trajectory` / `traffic_analytics` /
+  `od_analytics` / `alerts` behind HTTP endpoints. Must add real authorization on top
+  of `case_id` (trajectory-engine only logs, doesn't enforce). Needs to resolve how
+  this reconciles with Sumanth's already-existing FastAPI prototype on the `sumanth`
+  branch (different data shape — flat JSON, not SQLite) — still an open team
+  conversation, not resolved.
+- **`ui/` owner** — only depends on whatever `api/` exposes, not on trajectory-engine
+  directly. The CLI's fleet map is a reference for *what* it could show (multi-vehicle
+  map + plate search), not something to build on top of literally.
+- **Whoever picks the final demo city** — needs to verify that city's OpenStreetMap
+  coverage is actually complete and connected (validated for Guwahati specifically —
+  5,087 nodes, one connected component — not guaranteed for an arbitrary smaller town)
+  before swapping `config.DEMO_PLACE`.
+- **Whoever scales this past prototype** — swap SQLite → Postgres (schema is
+  portable, it's a connection-string change); move the camera-pair travel-time
+  precompute from full O(N²) to on-demand/incremental at real city scale (thousands
+  of cameras).
+
 ## What's still missing (the rest of the five-layer architecture)
 
 Trajectory reconstruction was deliberately chosen first because it needs no video or
