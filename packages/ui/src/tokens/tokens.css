@@ -1,0 +1,107 @@
+/*
+ * Trajectory Titans command-center design tokens.
+ *
+ * Intentionally dark-only: this is an operations tool (traffic control room,
+ * not a marketing site), used the way Bloomberg terminals / Grafana ops
+ * dashboards are — always in a dark, low-glare surface so live map/alert
+ * color-coding stays legible. No light theme is defined.
+ *
+ * Accent colors are reserved for state, not decoration:
+ *   --accent-cyan   = active / live / trajectory-in-motion
+ *   --accent-amber  = warning / medium severity
+ *   --accent-red    = critical / blacklist alert
+ *   --accent-green  = online / healthy / normal flow
+ */
+
+:root {
+  color-scheme: dark;
+
+  /* ---- Surface scale (deep navy-black, not pure black) ---- */
+  --bg-0: #070a10;   /* app background */
+  --bg-1: #0c111b;   /* panel background */
+  --bg-2: #121927;   /* raised card / table row */
+  --bg-3: #1a2233;   /* hovered / active row */
+  --bg-4: #232c40;   /* popover / modal surface */
+
+  /* ---- Borders ---- */
+  --border-subtle: #1c2432;
+  --border-default: #2a3448;
+  --border-strong: #3c4a63;
+
+  /* ---- Text ---- */
+  --text-primary: #e8ecf4;
+  --text-secondary: #9aa7bd;
+  --text-muted: #6b7690;
+  --text-disabled: #454f63;
+
+  /* ---- Accent: cyan (active / live / trajectory) ---- */
+  --accent-cyan-200: #a8f0ff;
+  --accent-cyan-400: #3fd8f0;
+  --accent-cyan-500: #22c5e0;
+  --accent-cyan-600: #14a3bd;
+  --accent-cyan-900: #0a2e38;
+
+  /* ---- Accent: amber (warning / medium severity) ---- */
+  --accent-amber-300: #ffd88a;
+  --accent-amber-400: #ffb84d;
+  --accent-amber-500: #f59e0b;
+  --accent-amber-900: #3a2508;
+
+  /* ---- Accent: red (critical / blacklist) ---- */
+  --accent-red-300: #ffb3b3;
+  --accent-red-400: #ff6b6b;
+  --accent-red-500: #ef4444;
+  --accent-red-600: #c8302f;
+  --accent-red-900: #3a0f0f;
+
+  /* ---- Accent: green (online / healthy) ---- */
+  --accent-green-400: #4ade80;
+  --accent-green-500: #22c55e;
+  --accent-green-900: #0e2e1a;
+
+  /* ---- Spacing scale (4px base) ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ---- Radius scale ---- */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-full: 999px;
+
+  /* ---- Shadows ---- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+  --shadow-glow-cyan: 0 0 0 1px rgba(34, 197, 224, 0.4), 0 0 16px rgba(34, 197, 224, 0.25);
+  --shadow-glow-red: 0 0 0 1px rgba(239, 68, 68, 0.5), 0 0 20px rgba(239, 68, 68, 0.35);
+
+  /* ---- Typography ---- */
+  --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+
+  --text-xs: 11px;
+  --text-sm: 12.5px;
+  --text-base: 14px;
+  --text-md: 16px;
+  --text-lg: 19px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+  --text-3xl: 44px;
+
+  /* ---- Motion ---- */
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 250ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+}

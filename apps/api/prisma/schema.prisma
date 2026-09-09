@@ -1,0 +1,149 @@
+// Prisma schema for the ANPR trajectory-tracking platform.
+//
+// Using SQLite instead of Postgres+PostGIS (see project decision: no Docker on the
+// dev machine). Geometry columns (lat/lng) are plain Floats; geospatial math
+// (distance, route lines) is done in application code in src/common/geo.ts using
+// the Haversine formula instead of PostGIS ST_Distance/ST_MakeLine. The schema
+// shape otherwise mirrors the brief's Postgres design 1:1 so it is a drop-in swap
+// if the project moves to Postgres+PostGIS later.
+//
+// SQLite's Prisma connector has no native enum support, so enum-shaped fields
+// below are plain Strings with the allowed values documented inline; validity
+// is enforced in application code (src/common) instead of the DB layer.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Camera {
+  id              String   @id @default(cuid())
+  code            String   @unique
+  name            String
+  lat             Float
+  lng             Float
+  roadName        String
+  zone            String
+  directionFacing String
+  status          String   @default("online") // online | offline | degraded
+  installedAt     DateTime @default(now())
+
+  detections      Detection[]
+  aggregates      TrafficAggregate[]
+  odOrigin        ODMatrixEntry[] @relation("od_origin")
+  odDestination   ODMatrixEntry[] @relation("od_destination")
+  alerts          Alert[]
+
+  @@index([zone])
+}
+
+model Vehicle {
+  id               String    @id @default(cuid())
+  plateText        String    @unique
+  firstSeenAt      DateTime
+  lastSeenAt       DateTime
+  isBlacklisted    Boolean   @default(false)
+  blacklistReason  String?
+  vehicleType      String    @default("Unknown")
+
+  detections       Detection[]
+  alerts           Alert[]
+
+  @@index([plateText])
+}
+
+model Detection {
+  id                  String   @id @default(cuid())
+  cameraId            String
+  camera              Camera   @relation(fields: [cameraId], references: [id])
+  vehicleId           String?
+  vehicle             Vehicle? @relation(fields: [vehicleId], references: [id])
+  plateText           String
+  plateTextRaw        String
+  confidenceScore     Float
+  detectedAt          DateTime
+  vehicleType         String
+  imageUrl            String?
+  boundingBoxJson      String?
+  speedEstimateKmph   Float?
+  createdAt           DateTime @default(now())
+
+  alerts              Alert[]
+
+  @@index([plateText])
+  @@index([cameraId, detectedAt])
+  @@index([detectedAt])
+}
+
+model Alert {
+  id              String    @id @default(cuid())
+  type            String    // blacklist_match | route_anomaly | speed_anomaly
+  plateText       String
+  vehicleId       String?
+  vehicle         Vehicle?  @relation(fields: [vehicleId], references: [id])
+  detectionId     String
+  detection       Detection @relation(fields: [detectionId], references: [id])
+  cameraId        String
+  camera          Camera    @relation(fields: [cameraId], references: [id])
+  severity        String    // low | medium | high | critical
+  message         String
+  status          String    @default("open") // open | acknowledged | resolved
+  createdAt       DateTime  @default(now())
+  acknowledgedBy  String?
+  acknowledgedAt  DateTime?
+
+  @@index([status, createdAt])
+  @@index([plateText])
+}
+
+model Watchlist {
+  id        String    @id @default(cuid())
+  plateText String
+  reason    String
+  addedBy   String
+  addedAt   DateTime  @default(now())
+  active    Boolean   @default(true)
+  expiresAt DateTime?
+
+  @@index([plateText, active])
+}
+
+model TrafficAggregate {
+  id                String   @id @default(cuid())
+  cameraId          String
+  camera            Camera   @relation(fields: [cameraId], references: [id])
+  bucketStart       DateTime
+  bucketSizeMinutes Int      @default(5)
+  vehicleCount      Int
+  avgSpeedKmph      Float
+  congestionScore   Float
+
+  @@unique([cameraId, bucketStart, bucketSizeMinutes])
+  @@index([bucketStart])
+}
+
+model ODMatrixEntry {
+  id                    String   @id @default(cuid())
+  originCameraId        String
+  originCamera          Camera   @relation("od_origin", fields: [originCameraId], references: [id])
+  destinationCameraId   String
+  destinationCamera     Camera   @relation("od_destination", fields: [destinationCameraId], references: [id])
+  bucketStart           DateTime
+  tripCount             Int
+  avgTravelTimeSeconds  Float
+
+  @@unique([originCameraId, destinationCameraId, bucketStart])
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("operator") // operator | admin
+  createdAt    DateTime @default(now())
+}

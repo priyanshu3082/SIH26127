@@ -1,0 +1,42 @@
+# Node
+node_modules/
+.pnpm-store/
+dist/
+build/
+.next/
+.turbo/
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+npm-debug.log*
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# ML artifacts / runtime output
+apps/ml-service/frames/
+apps/ml-service/output/
+
+# DB
+*.db
+*.sqlite
+*.sqlite3
+prisma/dev.db*
+
+# Local storage (MinIO substitute)
+apps/api/storage/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+
+# Local visual-verification screenshots (scripts/*.mjs are kept, outputs are not)
+scripts/*.png
+

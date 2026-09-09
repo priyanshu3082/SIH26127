@@ -1,0 +1,23 @@
+{
+  "name": "sih26127-trajectory-titans",
+  "private": true,
+  "version": "0.1.0",
+  "description": "City-Wide AI Engine for Multi-Camera ANPR Trajectory Tracking and Urban Traffic Analytics — SIH26127",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "dev:web": "turbo run dev --filter=web",
+    "dev:api": "turbo run dev --filter=api"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.3"
+  },
+  "packageManager": "pnpm@9.15.4",
+  "engines": {
+    "node": ">=20"
+  }
+}

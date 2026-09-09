@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import "@sih/ui/tokens.css";
+
+* {
+  border-color: var(--border-default);
+}
+
+html,
+body {
+  background: var(--bg-0);
+  color: var(--text-primary);
+}
+
+body {
+  font-family: var(--font-display);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-1);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--bg-1);
+}
+
+/* deck.gl / maplibre canvas should never introduce horizontal scroll */
+.maplibregl-map {
+  width: 100%;
+  height: 100%;
+}
+
+.maplibregl-ctrl-attrib {
+  font-size: 10px !important;
+  background: rgba(7, 10, 16, 0.7) !important;
+  color: var(--text-muted) !important;
+}
+.maplibregl-ctrl-attrib a {
+  color: var(--text-secondary) !important;
+}
