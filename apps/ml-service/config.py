@@ -29,7 +29,10 @@ MAX_PREPROCESS_RETRIES = 2
 # Get a key at https://openrouter.ai/keys. Leave USE_LLM_CROSSCHECK = False
 # to skip this entirely and run OCR-only (no API key needed, no cost).
 OPENROUTER_API_KEY = "YOUR API KEY HERE"
-USE_LLM_CROSSCHECK = True
+# Auto-disabled while the key above is still the placeholder, so a fresh
+# checkout runs OCR-only instead of burning retries on guaranteed-401 calls;
+# flips back on automatically once a real key is filled in above.
+USE_LLM_CROSSCHECK = OPENROUTER_API_KEY != "YOUR API KEY HERE"
 
 # Tiered model strategy: the cheap model runs on every attempt. The strong
 # (pricier) model is only called once, as a last resort, if OCR + the

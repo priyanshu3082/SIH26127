@@ -3,3 +3,6 @@ opencv-python-headless
 easyocr
 numpy
 requests
+fastapi
+uvicorn[standard]
+python-multipart

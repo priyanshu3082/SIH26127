@@ -13,6 +13,7 @@ from modules.vehicle_detector import detect_vehicles
 from modules.plate_detector import detect_plates
 from modules.color_detector import get_dominant_color
 from modules.text_extraction import extract_plate_text
+from modules.ocr_engine import structural_correct
 
 
 def detect_and_read(image_bgr, verbose=False):
@@ -32,7 +33,7 @@ def detect_and_read(image_bgr, verbose=False):
         return (int(x1 * scale_x), int(y1 * scale_y), int(x2 * scale_x), int(y2 * scale_y))
 
     detections = []
-    for (vx1, vy1, vx2, vy2), vehicle_type in detect_vehicles(processed):
+    for (vx1, vy1, vx2, vy2), vehicle_type, vehicle_conf in detect_vehicles(processed):
         vehicle_crop = crop(processed, (vx1, vy1, vx2, vy2))
         if vehicle_crop.size == 0:
             continue
@@ -49,12 +50,24 @@ def detect_and_read(image_bgr, verbose=False):
             abs_plate_box = abs_box
             break  # one plate per vehicle is enough for this use case
 
+        # Overall confidence = the vehicle detector's own confidence, scaled
+        # down unless the plate text also passes Indian-format structural
+        # validation - a real (if coarse) signal rather than a fabricated
+        # number, without re-plumbing OCR's own per-character confidence
+        # through the retry loop in text_extraction.py.
+        if plate_text:
+            _, structurally_valid, _ = structural_correct(plate_text)
+            confidence = vehicle_conf * (0.97 if structurally_valid else 0.72)
+        else:
+            confidence = vehicle_conf * 0.3
+
         detections.append({
             "vehicle_box": to_original((vx1, vy1, vx2, vy2)),
             "plate_box": to_original(abs_plate_box) if abs_plate_box else None,
             "vehicle_type": vehicle_type,
             "color": color_name,
             "plate_text": plate_text,
+            "confidence": round(min(confidence, 0.99), 3),
         })
 
     return detections
