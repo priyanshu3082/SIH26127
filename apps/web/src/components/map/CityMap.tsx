@@ -10,7 +10,7 @@ import type { Camera, TrafficAggregate } from "@sih/types";
 import { deckColors } from "@sih/ui";
 
 const MAP_STYLE =
-  process.env.NEXT_PUBLIC_MAP_STYLE ?? "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
+  process.env.NEXT_PUBLIC_MAP_STYLE ?? "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
 const INITIAL_VIEW_STATE = {
   longitude: 88.4172,

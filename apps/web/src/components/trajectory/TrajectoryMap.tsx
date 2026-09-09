@@ -9,7 +9,7 @@ import type { DetectionWithCamera } from "@sih/types";
 import { deckColors } from "@sih/ui";
 
 const MAP_STYLE =
-  process.env.NEXT_PUBLIC_MAP_STYLE ?? "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
+  process.env.NEXT_PUBLIC_MAP_STYLE ?? "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
 
 export interface TrajectoryMapProps {
   detections: DetectionWithCamera[];
@@ -47,7 +47,7 @@ export function TrajectoryMap({ detections, progress }: TrajectoryMapProps) {
       id: "trajectory-full-path",
       data: fullPath.length > 1 ? [{ path: fullPath }] : [],
       getPath: (d) => d.path as unknown as [number, number][],
-      getColor: [42, 52, 72, 180],
+      getColor: [148, 163, 184, 200],
       getWidth: 3,
       widthUnits: "pixels",
     }),

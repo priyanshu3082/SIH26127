@@ -11,14 +11,14 @@ page.on("console", (msg) => {
 console.log("== City Map ==");
 await page.goto("http://localhost:3000/", { waitUntil: "load", timeout: 45000 });
 await page.waitForSelector("text=DETECTIONS TODAY", { timeout: 15000 });
-await page.waitForTimeout(2000);
+await page.waitForTimeout(4000);
 await page.screenshot({ path: "scripts/run-citymap.png" });
 console.log("screenshot saved: scripts/run-citymap.png");
 
 console.log("== Trajectory: search + playback ==");
 await page.goto("http://localhost:3000/trajectory", { waitUntil: "load", timeout: 45000 });
 await page.waitForSelector('input[placeholder="WB 20 AB 1234"]');
-await page.fill('input[placeholder="WB 20 AB 1234"]', "WB05CF3475");
+await page.fill('input[placeholder="WB 20 AB 1234"]', "WB09G4960");
 await page.click('button:has-text("Track")');
 await page.waitForSelector("text=STOPS", { timeout: 10000 });
 await page.click('button svg.lucide-play >> xpath=..').catch(() => {});
