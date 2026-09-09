@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import { usePathname } from "next/navigation";
-import { Bell, Wifi, WifiOff } from "lucide-react";
-import { Badge, AppToast } from "@sih/ui";
+import { Bell } from "lucide-react";
+import { AppToast, RadarPulse } from "@sih/ui";
 import { useAlerts } from "@/lib/api";
 import { useLiveEvents } from "@/lib/socket";
 import type { AlertWithContext } from "@sih/types";
@@ -72,9 +72,12 @@ export function TopBar() {
               : " "}
           </span>
 
-          <Badge tone={connected ? "green" : "red"} dot>
-            {connected ? "Live" : "Offline"}
-          </Badge>
+          <div className="flex items-center gap-1.5">
+            <RadarPulse active={connected} />
+            <span className={`font-mono text-xs ${connected ? "text-cyan-300" : "text-text-disabled"}`}>
+              {connected ? "Live" : "Offline"}
+            </span>
+          </div>
 
           <a
             href="/alerts"

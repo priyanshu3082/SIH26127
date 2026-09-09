@@ -1,7 +1,7 @@
 "use client";
 
 import { Ban, ListChecks } from "lucide-react";
-import { Badge, Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, EmptyState } from "@sih/ui";
+import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, EmptyState, cn } from "@sih/ui";
 import type { WatchlistEntry } from "@sih/types";
 import { formatPlateDisplay } from "@/lib/plates";
 
@@ -52,9 +52,15 @@ export function WatchlistTable({ entries, onDeactivate, busyId }: WatchlistTable
               {entry.expiresAt ? new Date(entry.expiresAt).toLocaleDateString("en-IN") : "—"}
             </TableCell>
             <TableCell>
-              <Badge tone={entry.active ? "green" : "neutral"} dot>
+              <span
+                className={cn(
+                  "flex items-center gap-1.5 font-mono text-xs",
+                  entry.active ? "text-green-400" : "text-text-disabled",
+                )}
+              >
+                <span className={cn("h-1.5 w-1.5 rounded-full", entry.active ? "bg-green-400" : "bg-text-disabled")} />
                 {entry.active ? "Active" : "Inactive"}
-              </Badge>
+              </span>
             </TableCell>
             <TableCell>
               {entry.active && (

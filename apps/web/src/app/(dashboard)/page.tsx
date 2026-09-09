@@ -13,20 +13,18 @@ export default function CityOverviewPage() {
   const [hoveredCameraId, setHoveredCameraId] = React.useState<string | null>(null);
 
   return (
-    <div className="flex h-full flex-col">
-      <StatsRail />
-      <div className="flex min-h-0 flex-1">
-        <div className="relative min-w-0 flex-1">
-          <CityMap
-            cameras={cameras ?? []}
-            heatmapPoints={heatmap ?? []}
-            hoveredCameraId={hoveredCameraId}
-            onCameraClick={(camera: Camera) => setHoveredCameraId(camera.id)}
-          />
-        </div>
-        <div className="w-80 shrink-0 border-l border-border-subtle bg-bg-1">
-          <RecentDetectionsFeed />
-        </div>
+    <div className="flex h-full">
+      <div className="relative min-w-0 flex-1">
+        <CityMap
+          cameras={cameras ?? []}
+          heatmapPoints={heatmap ?? []}
+          hoveredCameraId={hoveredCameraId}
+          onCameraClick={(camera: Camera) => setHoveredCameraId(camera.id)}
+        />
+        <StatsRail />
+      </div>
+      <div className="w-80 shrink-0 border-l border-border-subtle bg-bg-1">
+        <RecentDetectionsFeed />
       </div>
     </div>
   );

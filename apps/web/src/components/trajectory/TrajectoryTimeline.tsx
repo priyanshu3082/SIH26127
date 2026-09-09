@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Pause, Play, RotateCcw, AlertTriangle } from "lucide-react";
+import { Pause, Play, RotateCcw, TriangleAlert } from "lucide-react";
 import { Button, cn } from "@sih/ui";
 import type { DetectionWithCamera, TrajectorySegment } from "@sih/types";
 
@@ -15,6 +15,13 @@ export interface TrajectoryTimelineProps {
   onScrub: (index: number) => void;
 }
 
+/**
+ * A transit-line-style route strip, not a wizard-step pill stepper: one
+ * continuous line with stops as ticks along it, each segment individually
+ * colored by whether it's been played yet and whether it's a flagged
+ * anomaly — the anomaly is shown exactly where it happened on the route,
+ * not as a separate floating badge disconnected from the map/timeline.
+ */
 export function TrajectoryTimeline({
   detections,
   segments,
@@ -24,61 +31,79 @@ export function TrajectoryTimeline({
   onReset,
   onScrub,
 }: TrajectoryTimelineProps) {
-  return (
-    <div className="flex items-center gap-3 border-t border-border-subtle bg-bg-1 px-4 py-3">
-      <Button variant="primary" size="icon" onClick={onToggle} disabled={!detections.length}>
-        {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-      </Button>
-      <Button variant="ghost" size="icon" onClick={onReset} disabled={!detections.length}>
-        <RotateCcw className="h-4 w-4" />
-      </Button>
+  const stopCount = detections.length;
+  const hasAnomaly = segments.some((s) => !s.plausible);
 
-      <div className="flex flex-1 items-center overflow-x-auto py-1">
+  // Insets the usable range to 6%-94% instead of the full 0%-100%, so the
+  // first/last stop's camera-code label (which overhangs its tick, centered
+  // via translate) has room to render without clipping at the panel edge.
+  const stopPct = (i: number) => (stopCount > 1 ? 6 + (i / (stopCount - 1)) * 88 : 50);
+
+  return (
+    <div className="flex items-center gap-4 border-t border-border-subtle bg-bg-1 px-4 py-3">
+      <div className="flex shrink-0 items-center gap-1.5">
+        <Button variant="primary" size="icon" onClick={onToggle} disabled={!stopCount}>
+          {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+        </Button>
+        <Button variant="ghost" size="icon" onClick={onReset} disabled={!stopCount}>
+          <RotateCcw className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="relative h-10 min-w-0 flex-1">
+        {segments.map((seg, i) => {
+          const leftPct = stopPct(i);
+          const widthPct = stopPct(i + 1) - leftPct;
+          const revealed = i < progress - 1;
+          return (
+            <div
+              key={i}
+              className={cn(
+                "absolute top-1/2 h-px -translate-y-1/2 transition-colors duration-300",
+                !seg.plausible ? "bg-red-500" : revealed ? "bg-cyan-500" : "bg-border",
+              )}
+              style={{ left: `${leftPct}%`, width: `${widthPct}%` }}
+            />
+          );
+        })}
+
         {detections.map((d, i) => {
+          const pct = stopPct(i);
           const revealed = i < progress;
           const isCurrent = i === progress - 1;
-          const segmentBefore = i > 0 ? segments[i - 1] : null;
           return (
-            <React.Fragment key={d.id}>
-              {i > 0 && (
-                <div
-                  className={cn(
-                    "h-px w-8 shrink-0 transition-colors duration-base",
-                    revealed ? "bg-cyan-500" : "bg-border",
-                    segmentBefore && !segmentBefore.plausible && "bg-red-500",
-                  )}
-                />
-              )}
-              <button
-                type="button"
-                onClick={() => onScrub(i + 1)}
-                className="flex shrink-0 flex-col items-center gap-1 px-1"
-                title={`${d.camera.code} — ${new Date(d.detectedAt).toLocaleTimeString("en-IN", { hour12: false })}`}
-              >
-                <span
-                  className={cn(
-                    "flex h-6 w-6 items-center justify-center rounded-full border font-mono text-[10px] transition-all duration-base",
-                    isCurrent
-                      ? "border-cyan-400 bg-cyan-500 text-bg-0 shadow-glow-cyan"
-                      : revealed
-                        ? "border-cyan-600 bg-cyan-900 text-cyan-300"
-                        : "border-border bg-bg-2 text-text-disabled",
-                  )}
-                >
-                  {i + 1}
-                </span>
-                <span className="font-mono text-[9px] text-text-muted">
-                  {new Date(d.detectedAt).toLocaleTimeString("en-IN", { hour12: false, hour: "2-digit", minute: "2-digit" })}
-                </span>
-              </button>
-            </React.Fragment>
+            <button
+              key={d.id}
+              type="button"
+              onClick={() => onScrub(i + 1)}
+              className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap"
+              style={{ left: `${pct}%` }}
+              title={`${d.camera.code} — ${new Date(d.detectedAt).toLocaleTimeString("en-IN", { hour12: false })}`}
+            >
+              <span className="pointer-events-none absolute -top-5 left-1/2 -translate-x-1/2 font-mono text-[9px] text-text-muted">
+                {d.camera.code.split("-").slice(0, 2).join("-")}
+              </span>
+              <span
+                className={cn(
+                  "block rounded-full border-2 border-bg-1 transition-all duration-300",
+                  isCurrent
+                    ? "h-3.5 w-3.5 bg-cyan-400 shadow-glow-cyan"
+                    : revealed
+                      ? "h-2.5 w-2.5 bg-cyan-600"
+                      : "h-2.5 w-2.5 bg-text-disabled",
+                )}
+              />
+              <span className="pointer-events-none absolute -bottom-4 left-1/2 -translate-x-1/2 font-mono text-[9px] text-text-disabled">
+                {new Date(d.detectedAt).toLocaleTimeString("en-IN", { hour12: false, hour: "2-digit", minute: "2-digit" })}
+              </span>
+            </button>
           );
         })}
       </div>
 
-      {segments.some((s) => !s.plausible) && (
-        <span className="flex shrink-0 items-center gap-1.5 rounded-md border border-red-500/40 bg-red-900 px-2 py-1 font-mono text-[10px] text-red-300">
-          <AlertTriangle className="h-3 w-3" /> Anomalous segment
+      {hasAnomaly && (
+        <span className="flex shrink-0 items-center gap-1.5 font-mono text-[11px] text-red-400">
+          <TriangleAlert className="h-3.5 w-3.5" /> anomalous segment
         </span>
       )}
     </div>

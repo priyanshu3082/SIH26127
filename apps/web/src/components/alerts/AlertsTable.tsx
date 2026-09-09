@@ -10,16 +10,23 @@ import {
   type SortingState,
 } from "@tanstack/react-table";
 import { ArrowUpDown, Check, CheckCheck } from "lucide-react";
-import { Badge, Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, EmptyState } from "@sih/ui";
+import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, EmptyState, cn } from "@sih/ui";
 import type { AlertSeverity, AlertWithContext } from "@sih/types";
 import { ShieldAlert } from "lucide-react";
 import { formatPlateDisplay } from "@/lib/plates";
 
-const severityTone: Record<AlertSeverity, "red" | "amber" | "neutral"> = {
-  critical: "red",
-  high: "red",
-  medium: "amber",
-  low: "neutral",
+const severityColor: Record<AlertSeverity, string> = {
+  critical: "text-red-400",
+  high: "text-red-400",
+  medium: "text-amber-400",
+  low: "text-text-secondary",
+};
+
+const severityDot: Record<AlertSeverity, string> = {
+  critical: "bg-red-400",
+  high: "bg-red-400",
+  medium: "bg-amber-400",
+  low: "bg-text-disabled",
 };
 
 const typeLabel: Record<string, string> = {
@@ -44,11 +51,15 @@ export function AlertsTable({ alerts, onAcknowledge, onResolve, busyId }: Alerts
     () => [
       columnHelper.accessor("severity", {
         header: "Severity",
-        cell: (info) => (
-          <Badge tone={severityTone[info.getValue()]} dot>
-            {info.getValue()}
-          </Badge>
-        ),
+        cell: (info) => {
+          const severity = info.getValue();
+          return (
+            <span className={cn("flex items-center gap-1.5 font-mono text-xs uppercase", severityColor[severity])}>
+              <span className={cn("h-1.5 w-1.5 rounded-full", severityDot[severity])} />
+              {severity}
+            </span>
+          );
+        },
       }),
       columnHelper.accessor("type", {
         header: "Type",
@@ -79,7 +90,15 @@ export function AlertsTable({ alerts, onAcknowledge, onResolve, busyId }: Alerts
         cell: (info) => {
           const status = info.getValue();
           return (
-            <Badge tone={status === "open" ? "red" : status === "acknowledged" ? "amber" : "green"}>{status}</Badge>
+            <span
+              className={cn(
+                "flex items-center gap-1.5 font-mono text-xs",
+                status === "open" ? "text-red-400" : status === "acknowledged" ? "text-amber-400" : "text-text-muted",
+              )}
+            >
+              {status === "open" && <span className="h-1.5 w-1.5 rounded-full bg-red-400" />}
+              {status}
+            </span>
           );
         },
       }),
@@ -153,13 +172,19 @@ export function AlertsTable({ alerts, onAcknowledge, onResolve, busyId }: Alerts
         ))}
       </TableHeader>
       <TableBody>
-        {table.getRowModel().rows.map((row) => (
-          <TableRow key={row.id}>
-            {row.getVisibleCells().map((cell) => (
-              <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-            ))}
-          </TableRow>
-        ))}
+        {table.getRowModel().rows.map((row) => {
+          const isOpen = row.original.status === "open";
+          return (
+            <TableRow
+              key={row.id}
+              className={cn("border-l-2", isOpen ? "border-l-red-500 bg-red-500/[0.03]" : "border-l-transparent")}
+            >
+              {row.getVisibleCells().map((cell) => (
+                <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+              ))}
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );

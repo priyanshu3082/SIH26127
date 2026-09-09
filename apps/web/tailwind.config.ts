@@ -92,6 +92,20 @@ const config: Config = {
         base: "200ms",
         slow: "250ms",
       },
+      keyframes: {
+        "radar-sweep": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+        "flash-in": {
+          "0%": { boxShadow: "0 0 0 1px rgba(63,216,240,0.7), 0 0 18px rgba(63,216,240,0.45)" },
+          "100%": { boxShadow: "0 0 0 0 rgba(63,216,240,0)" },
+        },
+      },
+      animation: {
+        "radar-sweep": "radar-sweep 2.8s linear infinite",
+        "flash-in": "flash-in 1.1s ease-out forwards",
+      },
     },
   },
   plugins: [tailwindcssAnimate],

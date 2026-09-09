@@ -3,7 +3,7 @@
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CarFront } from "lucide-react";
-import { Badge, EmptyState } from "@sih/ui";
+import { EmptyState, RadarPulse, cn } from "@sih/ui";
 import { useRecentDetections } from "@/lib/api";
 import { formatPlateDisplay } from "@/lib/plates";
 import type { DetectionWithCamera } from "@sih/types";
@@ -21,14 +21,33 @@ function timeAgo(iso: string): string {
 export function RecentDetectionsFeed() {
   const { data, isLoading } = useRecentDetections(25);
 
+  // The one deliberate glow moment in this panel: flash the row that just
+  // arrived, once, rather than a decorative pulse on every card.
+  const [flashId, setFlashId] = React.useState<string | null>(null);
+  const seenTopId = React.useRef<string | null>(null);
+
+  React.useEffect(() => {
+    const topId = data?.[0]?.id;
+    if (!topId) return;
+    const prev = seenTopId.current;
+    seenTopId.current = topId;
+    if (prev && prev !== topId) {
+      setFlashId(topId);
+      const t = setTimeout(() => setFlashId(null), 1100);
+      return () => clearTimeout(t);
+    }
+  }, [data]);
+
   return (
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between border-b border-border-subtle px-4 py-3">
         <h3 className="font-display text-sm font-semibold text-text-primary">Live Detection Feed</h3>
-        <span className="flex items-center gap-1.5 font-mono text-[10px] text-cyan-400">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-400" />
-          STREAMING
-        </span>
+        <div className="flex items-center gap-1.5">
+          <RadarPulse active={!isLoading} size={12} />
+          <span className="font-mono text-[10px] uppercase tracking-wider text-text-muted">
+            {isLoading ? "connecting" : "streaming"}
+          </span>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto">
@@ -51,11 +70,12 @@ export function RecentDetectionsFeed() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="flex items-center gap-3 border-b border-border-subtle px-4 py-2.5 hover:bg-bg-2"
+              className={cn(
+                "flex items-center gap-3 border-b border-border-subtle px-4 py-2.5 hover:bg-bg-2",
+                flashId === d.id && "animate-flash-in",
+              )}
             >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-bg-2 text-text-secondary">
-                <CarFront className="h-4 w-4" />
-              </div>
+              <CarFront className="h-4 w-4 shrink-0 text-text-muted" />
               <div className="min-w-0 flex-1">
                 <p className="truncate font-mono text-sm font-semibold text-text-primary">
                   {formatPlateDisplay(d.plateText)}
@@ -64,10 +84,15 @@ export function RecentDetectionsFeed() {
                   {d.camera.code} · {d.vehicleType}
                 </p>
               </div>
-              <div className="flex shrink-0 flex-col items-end gap-1">
-                <Badge tone={d.confidenceScore > 0.85 ? "green" : "amber"} className="px-1.5 py-0">
+              <div className="flex shrink-0 flex-col items-end gap-0.5">
+                <span
+                  className={cn(
+                    "font-mono text-xs font-semibold tabular-nums",
+                    d.confidenceScore > 0.85 ? "text-green-400" : "text-amber-400",
+                  )}
+                >
                   {(d.confidenceScore * 100).toFixed(0)}%
-                </Badge>
+                </span>
                 <span className="font-mono text-[10px] text-text-disabled">{timeAgo(d.detectedAt)}</span>
               </div>
             </motion.div>

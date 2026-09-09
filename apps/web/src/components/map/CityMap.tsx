@@ -103,7 +103,7 @@ export function CityMap({ cameras, heatmapPoints, onCameraClick, hoveredCameraId
         </div>
       )}
 
-      <div className="pointer-events-none absolute bottom-4 left-4 flex items-center gap-4 rounded-md border border-border-subtle bg-bg-1/90 px-3 py-2 backdrop-blur-sm">
+      <div className="pointer-events-none absolute bottom-4 left-4 flex items-center gap-4 rounded-md border border-border-subtle bg-bg-1 px-3 py-2">
         <LegendDot color="bg-green-500" label="Online" />
         <LegendDot color="bg-amber-500" label="Degraded" />
         <LegendDot color="bg-red-500" label="Offline" />
