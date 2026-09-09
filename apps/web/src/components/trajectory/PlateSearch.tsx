@@ -4,16 +4,11 @@ import * as React from "react";
 import { Search, Loader2 } from "lucide-react";
 import { Input, Button } from "@sih/ui";
 import { fetchKnownPlates } from "@/lib/api";
+import { formatPlateDisplay } from "@/lib/plates";
 
 export interface PlateSearchProps {
   onSearch: (plate: string) => void;
   loading?: boolean;
-}
-
-function formatPlateDisplay(plate: string): string {
-  const m = /^([A-Z]{2})(\d{1,2})([A-Z]{1,3})(\d{4})$/.exec(plate);
-  if (!m) return plate;
-  return `${m[1]} ${m[2]} ${m[3]} ${m[4]}`;
 }
 
 export function PlateSearch({ onSearch, loading }: PlateSearchProps) {

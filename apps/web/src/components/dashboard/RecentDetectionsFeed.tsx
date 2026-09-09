@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CarFront } from "lucide-react";
 import { Badge, EmptyState } from "@sih/ui";
 import { useRecentDetections } from "@/lib/api";
+import { formatPlateDisplay } from "@/lib/plates";
 import type { DetectionWithCamera } from "@sih/types";
 
 function timeAgo(iso: string): string {
@@ -15,12 +16,6 @@ function timeAgo(iso: string): string {
   if (minutes < 60) return `${minutes}m ago`;
   const hours = Math.floor(minutes / 60);
   return `${hours}h ago`;
-}
-
-function formatPlateDisplay(plate: string): string {
-  const m = /^([A-Z]{2})(\d{1,2})([A-Z]{1,3})(\d{4})$/.exec(plate);
-  if (!m) return plate;
-  return `${m[1]} ${m[2]} ${m[3]} ${m[4]}`;
 }
 
 export function RecentDetectionsFeed() {
