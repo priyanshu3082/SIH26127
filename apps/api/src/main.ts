@@ -3,6 +3,7 @@ import { NestFactory } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { join } from "path";
+import { existsSync, mkdirSync } from "fs";
 import { AppModule } from "./app.module";
 
 async function bootstrap() {
@@ -15,7 +16,13 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.setGlobalPrefix("api");
-  app.useStaticAssets(join(process.cwd(), "storage"), { prefix: "/media" });
+
+  // Resolved relative to the compiled dist/main.js, not process.cwd() — the
+  // monorepo build can launch this from the repo root (Render) or apps/api
+  // (local), and cwd differs between the two.
+  const storageDir = join(__dirname, "..", "storage");
+  if (!existsSync(storageDir)) mkdirSync(storageDir, { recursive: true });
+  app.useStaticAssets(storageDir, { prefix: "/media" });
 
   const port = process.env.PORT ? Number(process.env.PORT) : 4000;
   await app.listen(port);

@@ -1,22 +1,23 @@
 // Prisma schema for the ANPR trajectory-tracking platform.
 //
-// Using SQLite instead of Postgres+PostGIS (see project decision: no Docker on the
-// dev machine). Geometry columns (lat/lng) are plain Floats; geospatial math
-// (distance, route lines) is done in application code in src/common/geo.ts using
-// the Haversine formula instead of PostGIS ST_Distance/ST_MakeLine. The schema
-// shape otherwise mirrors the brief's Postgres design 1:1 so it is a drop-in swap
-// if the project moves to Postgres+PostGIS later.
+// Postgres (Render free-tier managed Postgres in deployment). Geometry columns
+// (lat/lng) are plain Floats rather than PostGIS geography columns; geospatial
+// math (distance, route lines) is done in application code in
+// src/common/geo.ts using the Haversine formula instead of PostGIS
+// ST_Distance/ST_MakeLine — the schema shape otherwise mirrors the brief's
+// PostGIS design 1:1 so real geography columns are a drop-in upgrade later.
 //
-// SQLite's Prisma connector has no native enum support, so enum-shaped fields
-// below are plain Strings with the allowed values documented inline; validity
-// is enforced in application code (src/common) instead of the DB layer.
+// Enum-shaped fields (status, type, severity, ...) are plain Strings with the
+// allowed values documented inline rather than native Postgres enums, so the
+// schema stays identical to when this ran on SQLite (whose connector has no
+// enum support) — validity is enforced in application code (src/common).
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

@@ -1,0 +1,32 @@
+# Render Blueprint — deploys the NestJS api + a managed Postgres database.
+# The web app (Next.js) is deployed separately to Vercel, not from this file.
+#
+# Usage: Render Dashboard -> New -> Blueprint -> point at this repo/branch.
+# WEB_ORIGIN below is a placeholder; update it to the real Vercel URL once
+# that deploy exists, so CORS/WebSocket allow the deployed frontend.
+services:
+  - type: web
+    name: sih26127-api
+    runtime: node
+    plan: free
+    branch: deploy/command-center
+    buildCommand: corepack enable && corepack prepare pnpm@9.15.4 --activate && pnpm install --frozen-lockfile && pnpm --filter api prisma:generate && pnpm --filter api exec prisma db push --skip-generate && pnpm --filter api build
+    startCommand: node apps/api/dist/main.js
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sih26127-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: WEB_ORIGIN
+        value: https://REPLACE-WITH-VERCEL-URL.vercel.app
+      - key: PORT
+        value: 4000
+      - key: NODE_VERSION
+        value: 22.10.0
+
+databases:
+  - name: sih26127-db
+    plan: free
+    postgresMajorVersion: 16

@@ -40,3 +40,6 @@ Thumbs.db
 # Local visual-verification screenshots (scripts/*.mjs are kept, outputs are not)
 scripts/*.png
 
+# Deployment credentials — never commit
+.deploy-secrets
+
