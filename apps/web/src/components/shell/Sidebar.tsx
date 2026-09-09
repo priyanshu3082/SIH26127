@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Route, ShieldAlert, ListChecks, Radar } from "lucide-react";
+import { LayoutDashboard, Route, ShieldAlert, ListChecks, Radar, Info } from "lucide-react";
 import { cn } from "@sih/ui";
 
 const NAV_ITEMS = [
@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: "/trajectory", label: "Track Vehicle", icon: Route },
   { href: "/alerts", label: "Alerts", icon: ShieldAlert },
   { href: "/watchlist", label: "Watchlist", icon: ListChecks },
+  { href: "/about", label: "About", icon: Info },
 ];
 
 export function Sidebar() {

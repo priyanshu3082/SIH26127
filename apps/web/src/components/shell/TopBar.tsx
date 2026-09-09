@@ -13,6 +13,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/trajectory": "Vehicle Trajectory Reconstruction",
   "/alerts": "Alerts",
   "/watchlist": "Watchlist Management",
+  "/about": "About This Solution",
 };
 
 interface ToastEntry {
